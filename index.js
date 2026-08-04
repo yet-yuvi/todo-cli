@@ -3,19 +3,16 @@ const path = require('path');
 
 const tasksFilePath = path.join(__dirname, 'tasks.json');
 
-let taskList = [];
-
-loadTasks();
+const taskList = loadTasks();
 
 function loadTasks() {
   if (!fs.existsSync(tasksFilePath)) {
     console.warn('Tasks file not found. Creating a new one.');
     fs.writeFileSync(tasksFilePath, '[]');
-    taskList = [];
-    return;
+    return [];
   }
   const data = fs.readFileSync(tasksFilePath, 'utf-8');
-  taskList = JSON.parse(data);
+  return JSON.parse(data);
 }
 
 console.log('Running To-Do CLI Application...');
