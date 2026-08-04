@@ -3,16 +3,31 @@ const path = require('path');
 
 const tasksFilePath = path.join(__dirname, 'tasks.json');
 
+function ensureFileExists() {
+  if (!fs.existsSync(tasksFilePath)) {
+    fs.writeFileSync(tasksFilePath, '[]', 'utf-8');
+  }
+}
+
 const taskList = loadTasks();
 
 function loadTasks() {
-  if (!fs.existsSync(tasksFilePath)) {
-    console.warn('Tasks file not found. Creating a new one.');
-    fs.writeFileSync(tasksFilePath, '[]');
+  ensureFileExists();
+
+  const data = fs.readFileSync(tasksFilePath, 'utf-8').trim();
+
+  if (!data) {
+    fs.writeFileSync(tasksFilePath, '[]', 'utf-8');
     return [];
   }
-  const data = fs.readFileSync(tasksFilePath, 'utf-8');
-  return JSON.parse(data);
+
+  try {
+    return JSON.parse(data);
+  } catch (error) {
+    console.warn('Error parsing tasks.json. Resetting tasks.json...');
+    fs.writeFileSync(tasksFilePath, '[]', 'utf-8');
+    return [];
+  }
 }
 
 console.log('Running To-Do CLI Application...');
@@ -26,7 +41,8 @@ if (command === 'add') {
 
 function addTask(taskTitle) {
   if (!taskTitle) {
-    throw new Error('Task title is required.');
+    console.error('Error: Task title is required.');
+    return;
   }
   const newTask = {
     id: crypto.randomUUID(),
