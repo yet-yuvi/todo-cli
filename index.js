@@ -1,4 +1,23 @@
-const taskList = [];
+const fs = require('fs');
+const path = require('path');
+
+const tasksFilePath = path.join(__dirname, 'tasks.json');
+
+let taskList = [];
+
+loadTasks();
+
+function loadTasks() {
+  if (!fs.existsSync(tasksFilePath)) {
+    console.warn('Tasks file not found. Creating a new one.');
+    fs.writeFileSync(tasksFilePath, '[]');
+    taskList = [];
+    return;
+  }
+  const data = fs.readFileSync(tasksFilePath, 'utf-8');
+  taskList = JSON.parse(data);
+}
+
 console.log('Running To-Do CLI Application...');
 
 const command = process.argv[2];
@@ -18,6 +37,12 @@ function addTask(taskTitle) {
     date: new Date(),
   };
   taskList.push(newTask);
+  saveTask();
+  console.log(`Task added: ${taskTitle}`);
+}
+
+function saveTask() {
+  fs.writeFileSync(tasksFilePath, JSON.stringify(taskList, null, 2));
 }
 
 console.log('Current Task List:', taskList);
