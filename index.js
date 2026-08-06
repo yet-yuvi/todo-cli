@@ -1,4 +1,4 @@
-const { addTask, viewTasks } = require('./taskRepo');
+const { addTask, viewTasks, deleteTask } = require('./taskRepo');
 
 console.log('Running To-Do CLI Application...');
 
@@ -9,4 +9,6 @@ if (command === 'add') {
   addTask(value);
 } else if (command === 'view') {
   viewTasks();
+} else if (command === 'delete') {
+  deleteTask(value);
 }

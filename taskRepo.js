@@ -65,7 +65,18 @@ function viewTasks() {
   console.log('================================================');
 }
 
+function deleteTask(taskId) {
+  const taskList = loadTasks();
+  console.warn(`Deleting task with ID: ${taskId}`);
+  const updatedTaskList = taskList.filter(
+    (task) => task.id !== parseInt(taskId),
+  );
+  saveTask(updatedTaskList);
+  console.log(`Task with ID ${taskId} deleted.`);
+}
+
 module.exports = {
   addTask,
   viewTasks,
+  deleteTask,
 };
