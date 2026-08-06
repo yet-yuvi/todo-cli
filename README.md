@@ -8,9 +8,9 @@ A lightweight, modular, and crash-proof Command Line Interface (CLI) application
 
 - **Modular Architecture:** Business logic and file persistence layer are cleanly isolated inside a dedicated module (`taskRepo.js`).
 - **File-Based Persistence:** Automatically creates and syncs tasks with a local `tasks.json` file.
-- **Unique Task Identification:** Generates cryptographically secure UUIDs for every new task using Node.js native `crypto.randomUUID()`.
+- **Sequential ID Generation:** Generates auto-incrementing numeric IDs starting from `100` using `Array.prototype.reduce()`.
 - **Crash-Proof JSON Handling:** Handles empty, missing, or corrupted JSON storage gracefully using auto-reset logic and `try...catch`.
-- **Task Management CLI:** Supports adding new tasks and listing existing tasks with formatted terminal output.
+- **Task Management CLI:** Supports adding, viewing, and deleting tasks with formatted terminal output.
 
 ---
 
@@ -32,7 +32,7 @@ todo-cli/
 
 ### Prerequisites
 - **Node.js** (`v24.19.0` as specified in `.nvmrc`)
-- **NVM** (Node Version Manager) is recommended to switch to the exact Node version easily.
+- **NVM** (Node Version Manager) is recommended to easily switch to the target Node version.
 
 ### Installation & Setup
 1. Clone the repository:
@@ -47,7 +47,7 @@ todo-cli/
    ```
    *(If you do not have Node.js `v24.19.0` installed, run `nvm install` first).*
 
-3. No external NPM dependencies are required. The application runs entirely on native Node.js core modules (`fs`, `path`, `crypto`).
+3. No external NPM dependencies are required. The application runs entirely on native Node.js core modules (`fs`, `path`).
 
 ---
 
@@ -63,7 +63,8 @@ node index.js add "Complete CLI modularization"
 **Terminal Output:**
 ```text
 Running To-Do CLI Application...
-Task added: Complete CLI modularization
+Saving 5 tasks to tasks.json...
+Task added: I'm Juliet
 ```
 
 ---
@@ -81,36 +82,58 @@ Running To-Do CLI Application...
 ================ Available Tasks ===============
 [
   {
-    id: 'a09ffe96-4e44-4f67-96b1-c6a8fe015ce5',
+    id: 100,
     title: "I'm Johan",
     date: '2026-08-04T22:00:08.826Z'
   },
   {
-    id: 'c48b0873-a563-4c9d-a350-e909ab1a8bb8',
+    id: 101,
     title: "I'm Jubayar",
     date: '2026-08-04T22:00:20.881Z'
   },
   {
-    id: 'a43c7f2b-4f8f-434c-8d06-771161dd0b5a',
+    id: 102,
     title: "I'm Luke",
     date: '2026-08-04T22:01:11.257Z'
   },
   {
-    id: '2686a485-bcbc-4779-88cb-19fd2ec63ffb',
+    id: 103,
     title: "I'm Henz",
     date: '2026-08-04T22:02:30.545Z'
-  }
+  },
+  {
+    id: 104,
+    title: "I'm Julia",
+    date: '2026-08-04T22:02:30.545Z'
+  },
 ]
 ================================================
 ```
 
 ---
 
+### 3. Delete a Task
+Delete a task from your list by passing the `delete` command followed by the target task ID:
+
+```bash
+node index.js delete 100
+```
+
+**Terminal Output:**
+```text
+Running To-Do CLI Application...
+Deleting task with ID: 100
+Saving 4 tasks to tasks.json...
+Task with ID 100 deleted.
+```
+
+---
+
 ## 🛡️ Error Handling & Data Safety
 
-- **Missing File Handling:** Automatically creates `tasks.json` initialized with `[]` if it doesn't exist.
-- **Auto-Recovery on Corruption:** If `tasks.json` contains invalid JSON syntax, it warns the user and safely resets the file without throwing an unhandled exception.
-- **Input Validation:** Logs a user-friendly error message when `taskTitle` is missing instead of throwing runtime errors.
+- **Missing File Handling:** Automatically creates `tasks.json` initialized with `[]` if the file is missing.
+- **Auto-Recovery on Corruption:** If `tasks.json` contains invalid JSON syntax, it warns the user and safely resets the file without crashing the runtime.
+- **Input Validation:** Prevents bad state writes by logging structured error messages when `taskTitle` is missing or when saving non-array data types.
 
 ---
 
