@@ -60,7 +60,6 @@ function viewTasks() {
 }
 
 module.exports = {
-  loadTasks,
   addTask,
   viewTasks,
 };
