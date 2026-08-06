@@ -34,6 +34,7 @@ function saveTask(taskList) {
     return;
   }
   fs.writeFileSync(tasksFilePath, JSON.stringify(taskList, null, 2));
+  console.log(`Saving ${taskList.length} tasks to tasks.json...`);
 }
 
 function addTask(taskTitle) {
@@ -41,12 +42,17 @@ function addTask(taskTitle) {
     console.error('Error: Task title is required.');
     return;
   }
+  const taskList = loadTasks();
+  // const maxId = Math.max(0, ...taskList.map((task) => task.id));
+  const maxId = taskList.reduce(
+    (max, task) => (task.id > max ? task.id : max),
+    99,
+  );
   const newTask = {
-    id: crypto.randomUUID(),
+    id: maxId + 1,
     title: taskTitle,
     date: new Date(),
   };
-  const taskList = loadTasks();
   taskList.push(newTask);
   saveTask(taskList);
   console.log(`Task added: ${taskTitle}`);
