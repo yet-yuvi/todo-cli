@@ -37,19 +37,24 @@ function saveTask(taskList) {
   console.log(`Saving ${taskList.length} tasks to tasks.json...`);
 }
 
+generateNextId = (taskList) => {
+  // const maxId = Math.max(0, ...taskList.map((task) => task.id));
+  const maxId = taskList.reduce(
+    (max, task) => (task.id > max ? task.id : max),
+    99,
+  );
+  return maxId + 1;
+};
+
 function addTask(taskTitle) {
   if (!taskTitle) {
     console.error('Error: Task title is required.');
     return;
   }
   const taskList = loadTasks();
-  // const maxId = Math.max(0, ...taskList.map((task) => task.id));
-  const maxId = taskList.reduce(
-    (max, task) => (task.id > max ? task.id : max),
-    99,
-  );
+
   const newTask = {
-    id: maxId + 1,
+    id: generateNextId(taskList),
     title: taskTitle,
     date: new Date(),
   };
