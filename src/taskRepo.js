@@ -1,9 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const tasksFilePath = path.join(__dirname, 'tasks.json');
+const dataDir = path.join(__dirname, '../.data');
+const tasksFilePath = path.join(dataDir, 'tasks.json');
 
 function ensureFileExists() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
   if (!fs.existsSync(tasksFilePath)) {
     fs.writeFileSync(tasksFilePath, '[]', 'utf-8');
   }

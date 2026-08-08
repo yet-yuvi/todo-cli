@@ -6,8 +6,8 @@ A lightweight, modular, and crash-proof Command Line Interface (CLI) application
 
 ## ✨ Features
 
-- **Modular Architecture:** Business logic and file persistence layer are cleanly isolated inside a dedicated module (`taskRepo.js`).
-- **File-Based Persistence:** Automatically creates and syncs tasks with a local `tasks.json` file.
+- **Modular Architecture:** Source code is isolated under `src/` while data storage is separated inside `.data/`.
+- **File-Based Persistence:** Automatically manages and syncs tasks with a local `.data/tasks.json` file.
 - **Sequential ID Generation:** Generates auto-incrementing numeric IDs starting from `100` using `Array.prototype.reduce()`.
 - **Crash-Proof JSON Handling:** Handles empty, missing, or corrupted JSON storage gracefully using auto-reset logic and `try...catch`.
 - **Task Management CLI:** Supports adding, viewing, and deleting tasks with formatted terminal output.
@@ -18,11 +18,14 @@ A lightweight, modular, and crash-proof Command Line Interface (CLI) application
 
 ```text
 todo-cli/
-├── index.js          # Entry point (CLI argument parsing & routing)
-├── taskRepo.js        # Core repository module (Data operations & file I/O)
-├── tasks.json        # Auto-generated JSON database (Git ignored)
+├── .data/            # Auto-generated data directory (Git ignored)
+│   └── tasks.json    # JSON task database
+├── src/              # Source code directory
+│   ├── index.js      # Entry point (CLI argument parsing & routing)
+│   └── taskRepo.js   # Core repository module (Data operations & file I/O)
 ├── .gitignore        # Specifies files ignored by Git tracking
 ├── .nvmrc            # Specifies the required Node.js version (v24.19.0)
+├── package.json      # Project metadata & npm scripts
 └── README.md         # Project documentation
 ```
 
@@ -57,23 +60,31 @@ todo-cli/
 Add a new task to your list by passing the `add` command followed by the task title:
 
 ```bash
-node index.js add "Complete CLI modularization"
+# Recommended
+npm start -- add "Complete CLI modularization"
+
+# Alternative
+node src/index.js add "Complete CLI modularization"
 ```
 
 **Terminal Output:**
 ```text
 Running To-Do CLI Application...
-Saving 5 tasks to tasks.json...
-Task added: I'm Juliet
+Saving 1 tasks to tasks.json...
+Task added: Complete CLI modularization
 ```
 
 ---
 
 ### 2. View All Tasks
-Display all stored tasks from `tasks.json`:
+Display all stored tasks from `.data/tasks.json`:
 
 ```bash
-node index.js view
+# Recommended
+npm start -- view
+
+# Alternative
+node src/index.js view
 ```
 
 **Terminal Output:**
@@ -106,6 +117,11 @@ Running To-Do CLI Application...
     title: "I'm Julia",
     date: '2026-08-04T22:02:30.545Z'
   },
+  {
+    id: 105,
+    title: "Complete CLI modularization",
+    date: '2026-08-08T15:30:00.000Z'
+  },
 ]
 ================================================
 ```
@@ -116,14 +132,18 @@ Running To-Do CLI Application...
 Delete a task from your list by passing the `delete` command followed by the target task ID:
 
 ```bash
-node index.js delete 100
+# Recommended
+npm start -- delete 100
+
+# Alternative
+node src/index.js delete 100
 ```
 
 **Terminal Output:**
 ```text
 Running To-Do CLI Application...
 Deleting task with ID: 100
-Saving 4 tasks to tasks.json...
+Saving 5 tasks to tasks.json...
 Task with ID 100 deleted.
 ```
 
@@ -131,7 +151,7 @@ Task with ID 100 deleted.
 
 ## 🛡️ Error Handling & Data Safety
 
-- **Missing File Handling:** Automatically creates `tasks.json` initialized with `[]` if the file is missing.
+- **Missing Directory/File Handling:** Automatically creates the `.data/` directory and `tasks.json` file if they do not exist.
 - **Auto-Recovery on Corruption:** If `tasks.json` contains invalid JSON syntax, it warns the user and safely resets the file without crashing the runtime.
 - **Input Validation:** Prevents bad state writes by logging structured error messages when `taskTitle` is missing or when saving non-array data types.
 
