@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const logger = require('./logger');
 
 const dataDir = path.join(__dirname, '../.data');
 const tasksFilePath = path.join(dataDir, 'tasks.json');
@@ -27,7 +28,7 @@ function loadTasks() {
   try {
     return JSON.parse(data);
   } catch (error) {
-    console.warn('Error parsing tasks.json. Resetting tasks.json...');
+    logger.warn('Error parsing tasks.json. Resetting tasks.json...');
     fs.writeFileSync(tasksFilePath, '[]', 'utf-8');
     return [];
   }
@@ -35,11 +36,11 @@ function loadTasks() {
 
 function saveTask(taskList) {
   if (!Array.isArray(taskList)) {
-    console.error('Error: taskList must be an array.');
+    logger.error('Error: taskList must be an array.');
     return;
   }
   fs.writeFileSync(tasksFilePath, JSON.stringify(taskList, null, 2));
-  console.log(`Saving ${taskList.length} tasks to tasks.json...`);
+  logger.info(`Saving ${taskList.length} tasks to tasks.json...`);
 }
 
 generateNextId = (taskList) => {
@@ -53,7 +54,7 @@ generateNextId = (taskList) => {
 
 function addTask(taskTitle) {
   if (!taskTitle) {
-    console.error('Error: Task title is required.');
+    logger.error('Error: Task title is required.');
     return;
   }
   const taskList = loadTasks();
@@ -65,24 +66,45 @@ function addTask(taskTitle) {
   };
   taskList.push(newTask);
   saveTask(taskList);
-  console.log(`Task added: ${taskTitle}`);
+  logger.info(`Task added: ${taskTitle}`);
 }
 
 function viewTasks() {
   const taskList = loadTasks();
-  console.log('================ Available Tasks ===============');
-  console.log(taskList);
-  console.log('================================================');
+  logger.info(
+    '======================== Available Tasks =======================',
+  );
+  logger.info(
+    taskList
+      .map((task) => `[${task.date}] ID: ${task.id}: ${task.title}`)
+      .join('\n'),
+  );
+  logger.info(
+    '================================================================',
+  );
 }
 
 function deleteTask(taskId) {
+  if (!taskId) {
+    logger.error('Error: Task ID is required for deletion.');
+    return;
+  }
+
   const taskList = loadTasks();
-  console.warn(`Deleting task with ID: ${taskId}`);
-  const updatedTaskList = taskList.filter(
-    (task) => task.id !== parseInt(taskId),
-  );
+  const numericId = parseInt(taskId, 10);
+
+  const taskExists = taskList.some((task) => task.id === numericId);
+
+  if (!taskExists) {
+    logger.error(`Error: Task with ID ${taskId} not found.`);
+    return;
+  }
+
+  logger.warn(`Deleting task with ID: ${taskId}`);
+  const updatedTaskList = taskList.filter((task) => task.id !== numericId);
+
   saveTask(updatedTaskList);
-  console.log(`Task with ID ${taskId} deleted.`);
+  logger.info(`Task with ID ${taskId} deleted.`);
 }
 
 module.exports = {
