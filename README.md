@@ -7,10 +7,12 @@ A lightweight, modular, and crash-proof Command Line Interface (CLI) application
 ## ✨ Features
 
 - **Modular Architecture:** Source code is isolated under `src/` while data storage is separated inside `.data/`.
+- **Colored Terminal Output:** Uses a custom Chalk logger for color-coded status messages (`INFO` in blue, `WARN` in yellow, `ERROR` in red).
 - **File-Based Persistence:** Automatically manages and syncs tasks with a local `.data/tasks.json` file.
-- **Sequential ID Generation:** Generates auto-incrementing numeric IDs starting from `100` using `Array.prototype.reduce()`.
+- **Sequential ID Generation:** Generates auto-incrementing numeric IDs using `Array.prototype.reduce()`.
 - **Crash-Proof JSON Handling:** Handles empty, missing, or corrupted JSON storage gracefully using auto-reset logic and `try...catch`.
-- **Task Management CLI:** Supports adding, viewing, and deleting tasks with formatted terminal output.
+- **Input & Existence Validation:** Validates required fields for adding/deleting tasks and ensures a task exists before attempting deletion.
+- **Formatted CLI Output:** Displays tasks in a clean, human-readable list format rather than raw JSON.
 
 ---
 
@@ -22,6 +24,7 @@ todo-cli/
 │   └── tasks.json    # JSON task database
 ├── src/              # Source code directory
 │   ├── index.js      # Entry point (CLI argument parsing & routing)
+│   ├── logger.js     # Custom Chalk logger module (Colored log output)
 │   └── taskRepo.js   # Core repository module (Data operations & file I/O)
 ├── .gitignore        # Specifies files ignored by Git tracking
 ├── .nvmrc            # Specifies the required Node.js version (v24.19.0)
@@ -35,7 +38,7 @@ todo-cli/
 
 ### Prerequisites
 - **Node.js** (`v24.19.0` as specified in `.nvmrc`)
-- **NVM** (Node Version Manager) is recommended to easily switch to the target Node version.
+- **NVM** (Node Version Manager) is recommended.
 
 ### Installation & Setup
 1. Clone the repository:
@@ -48,9 +51,11 @@ todo-cli/
    ```bash
    nvm use
    ```
-   *(If you do not have Node.js `v24.19.0` installed, run `nvm install` first).*
 
-3. No external NPM dependencies are required. The application runs entirely on native Node.js core modules (`fs`, `path`).
+3. Install project dependencies (`chalk` v4 for CommonJS support):
+   ```bash
+   npm install
+   ```
 
 ---
 
@@ -70,7 +75,7 @@ node src/index.js add "Complete CLI modularization"
 **Terminal Output:**
 ```text
 Running To-Do CLI Application...
-Saving 1 tasks to tasks.json...
+Saving 4 tasks to tasks.json...
 Task added: Complete CLI modularization
 ```
 
@@ -90,40 +95,12 @@ node src/index.js view
 **Terminal Output:**
 ```text
 Running To-Do CLI Application...
-================ Available Tasks ===============
-[
-  {
-    id: 100,
-    title: "I'm Johan",
-    date: '2026-08-04T22:00:08.826Z'
-  },
-  {
-    id: 101,
-    title: "I'm Jubayar",
-    date: '2026-08-04T22:00:20.881Z'
-  },
-  {
-    id: 102,
-    title: "I'm Luke",
-    date: '2026-08-04T22:01:11.257Z'
-  },
-  {
-    id: 103,
-    title: "I'm Henz",
-    date: '2026-08-04T22:02:30.545Z'
-  },
-  {
-    id: 104,
-    title: "I'm Julia",
-    date: '2026-08-04T22:02:30.545Z'
-  },
-  {
-    id: 105,
-    title: "Complete CLI modularization",
-    date: '2026-08-08T15:30:00.000Z'
-  },
-]
-================================================
+======================== Available Tasks =======================
+[2026-08-04T22:00:08.826Z] ID: 100: I'm Johan
+[2026-08-04T22:00:20.881Z] ID: 101: I'm Jubayar
+[2026-08-04T22:01:11.257Z] ID: 102: I'm Luke
+[2026-08-04T22:01:31.215Z] ID: 103: Complete CLI modularization
+================================================================
 ```
 
 ---
@@ -143,7 +120,7 @@ node src/index.js delete 100
 ```text
 Running To-Do CLI Application...
 Deleting task with ID: 100
-Saving 5 tasks to tasks.json...
+Saving 3 tasks to tasks.json...
 Task with ID 100 deleted.
 ```
 
@@ -151,9 +128,13 @@ Task with ID 100 deleted.
 
 ## 🛡️ Error Handling & Data Safety
 
-- **Missing Directory/File Handling:** Automatically creates the `.data/` directory and `tasks.json` file if they do not exist.
-- **Auto-Recovery on Corruption:** If `tasks.json` contains invalid JSON syntax, it warns the user and safely resets the file without crashing the runtime.
-- **Input Validation:** Prevents bad state writes by logging structured error messages when `taskTitle` is missing or when saving non-array data types.
+- **Custom Colored Logging:** Visual feedback using Chalk (`blue` for info, `yellow` for warnings, `red` for errors).
+- **Missing Directory/File Handling:** Automatically creates `.data/` directory and `tasks.json` if missing.
+- **Auto-Recovery on Corruption:** Warns the user and safely resets corrupted `tasks.json` files without crashing.
+- **Strict Input Validation:** 
+  - Throws an error if `add` is called without a task title.
+  - Throws an error if `delete` is called without a task ID.
+  - Warns if the specified task ID for deletion does not exist in `tasks.json`.
 
 ---
 
