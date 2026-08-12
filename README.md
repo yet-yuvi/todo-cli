@@ -10,8 +10,9 @@ A lightweight, modular, and crash-proof Command Line Interface (CLI) application
 - **Colored Terminal Output:** Uses a custom Chalk logger for color-coded status messages (`INFO` in blue, `WARN` in yellow, `ERROR` in red).
 - **File-Based Persistence:** Automatically manages and syncs tasks with a local `.data/tasks.json` file.
 - **Sequential ID Generation:** Generates auto-incrementing numeric IDs using `Array.prototype.reduce()`.
+- **Task Editing:** Allows updating existing task titles while automatically updating the modified timestamp.
 - **Crash-Proof JSON Handling:** Handles empty, missing, or corrupted JSON storage gracefully using auto-reset logic and `try...catch`.
-- **Input & Existence Validation:** Validates required fields for adding/deleting tasks and ensures a task exists before attempting deletion.
+- **Input & Existence Validation:** Validates required fields for adding, editing, and deleting tasks and ensures a task exists before updating or deleting.
 - **Formatted CLI Output:** Displays tasks in a clean, human-readable list format rather than raw JSON.
 
 ---
@@ -105,7 +106,27 @@ Running To-Do CLI Application...
 
 ---
 
-### 3. Delete a Task
+### 3. Edit a Task
+Edit an existing task title by passing the `edit` command, target task ID, and the new title:
+
+```bash
+# Recommended
+npm start -- edit 100 "I'm Johan Liebert"
+
+# Alternative
+node src/index.js edit 100 "I'm Johan Liebert"
+```
+
+**Terminal Output:**
+```text
+Running To-Do CLI Application...
+Saving 4 tasks to tasks.json...
+Task 100 updated to: "I'm Johan Liebert"
+```
+
+---
+
+### 4. Delete a Task
 Delete a task from your list by passing the `delete` command followed by the target task ID:
 
 ```bash
@@ -133,8 +154,9 @@ Task with ID 100 deleted.
 - **Auto-Recovery on Corruption:** Warns the user and safely resets corrupted `tasks.json` files without crashing.
 - **Strict Input Validation:** 
   - Throws an error if `add` is called without a task title.
+  - Throws an error if `edit` is called without a task ID or new title.
   - Throws an error if `delete` is called without a task ID.
-  - Warns if the specified task ID for deletion does not exist in `tasks.json`.
+  - Warns if the specified task ID for editing or deletion does not exist in `tasks.json`.
 
 ---
 
