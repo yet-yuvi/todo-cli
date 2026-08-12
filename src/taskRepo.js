@@ -39,11 +39,14 @@ function saveTask(taskList) {
     logger.error('Error: taskList must be an array.');
     return;
   }
-  fs.writeFileSync(tasksFilePath, JSON.stringify(taskList, null, 2));
+
+  ensureFileExists();
+
+  fs.writeFileSync(tasksFilePath, JSON.stringify(taskList, null, 2), 'utf-8');
   logger.info(`Saving ${taskList.length} tasks to tasks.json...`);
 }
 
-generateNextId = (taskList) => {
+const generateNextId = (taskList) => {
   // const maxId = Math.max(0, ...taskList.map((task) => task.id));
   const maxId = taskList.reduce(
     (max, task) => (task.id > max ? task.id : max),
@@ -62,7 +65,7 @@ function addTask(taskTitle) {
   const newTask = {
     id: generateNextId(taskList),
     title: taskTitle,
-    date: new Date(),
+    date: new Date().toISOString(),
   };
   taskList.push(newTask);
   saveTask(taskList);
@@ -74,11 +77,15 @@ function viewTasks() {
   logger.info(
     '======================== Available Tasks =======================',
   );
-  logger.info(
-    taskList
-      .map((task) => `[${task.date}] ID: ${task.id}: ${task.title}`)
-      .join('\n'),
-  );
+  if (taskList.length === 0) {
+    logger.info('No tasks found.');
+  } else {
+    logger.info(
+      taskList
+        .map((task) => `[${task.date}] ID: ${task.id}: ${task.title}`)
+        .join('\n'),
+    );
+  }
   logger.info(
     '================================================================',
   );
