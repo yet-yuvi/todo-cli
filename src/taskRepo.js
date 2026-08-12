@@ -114,8 +114,36 @@ function deleteTask(taskId) {
   logger.info(`Task with ID ${taskId} deleted.`);
 }
 
+function editTask(id, newTitle) {
+  if (!id) {
+    logger.error('Error: Task ID is required for editing.');
+    return;
+  }
+  if (!newTitle) {
+    logger.error('Error: New title is missing.');
+    return;
+  }
+
+  const taskList = loadTasks();
+  const idToEdit = parseInt(id, 10);
+
+  const taskIndex = taskList.findIndex((task) => task.id === idToEdit);
+
+  if (taskIndex === -1) {
+    logger.error(`Error: Task with ID ${idToEdit} not found.`);
+    return;
+  }
+
+  taskList[taskIndex].title = newTitle;
+  taskList[taskIndex].date = new Date().toISOString();
+
+  saveTask(taskList);
+  logger.info(`Task ${idToEdit} updated to: "${newTitle}"`);
+}
+
 module.exports = {
   addTask,
   viewTasks,
   deleteTask,
+  editTask,
 };
